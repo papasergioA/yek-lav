@@ -11,164 +11,144 @@ import java.net.UnknownHostException;
 
 import java.util.Random;
 
+public class ClientConnexion implements Runnable {
 
-public class ClientConnexion implements Runnable{
+	private Socket connexion = null;
 
+	private PrintWriter writer = null;
 
-   private Socket connexion = null;
+	private BufferedInputStream reader = null;
 
-   private PrintWriter writer = null;
+	// Notre liste de commandes. Le serveur nous répondra différemment selon la
+	// commande utilisée.
 
-   private BufferedInputStream reader = null;
+	private String[] listCommands = { "FULL", "DATE", "HOUR", "NONE" };
 
-   
+	private static int count = 0;
 
-   //Notre liste de commandes. Le serveur nous répondra différemment selon la commande utilisée.
+	private String name = "Client-";
 
-   private String[] listCommands = {"FULL", "DATE", "HOUR", "NONE"};
+	public ClientConnexion(String host, int port) {
 
-   private static int count = 0;
+		name += ++count;
 
-   private String name = "Client-";   
+		try {
 
-   
+			connexion = new Socket(host, port);
 
-   public ClientConnexion(String host, int port){
+		} catch (UnknownHostException e) {
 
-      name += ++count;
+			e.printStackTrace();
 
-      try {
+		} catch (IOException e) {
 
-         connexion = new Socket(host, port);
+			e.printStackTrace();
 
-      } catch (UnknownHostException e) {
+		}
 
-         e.printStackTrace();
+	}
 
-      } catch (IOException e) {
+	public void run() {
 
-         e.printStackTrace();
+		// nous n'allons faire que 10 demandes par thread...
 
-      }
+		for (int i = 0; i < 3; i++) {
 
-   }
+			try {
 
-   
+				Thread.currentThread().sleep(1000);
 
-   
+			} catch (InterruptedException e) {
 
-   public void run(){
+				e.printStackTrace();
 
+			}
 
-      //nous n'allons faire que 10 demandes par thread...
+			try {
 
-      for(int i =0; i < 3; i++){
+				writer = new PrintWriter(connexion.getOutputStream(), true);
 
-         try {
+				reader = new BufferedInputStream(connexion.getInputStream());
 
-            Thread.currentThread().sleep(1000);
+				// On envoie la commande au serveur
 
-         } catch (InterruptedException e) {
+				String commande = getCommand();
 
-            e.printStackTrace();
+				writer.write(commande);
 
-         }
+				// TOUJOURS UTILISER flush() POUR ENVOYER RÉELLEMENT DES INFOS
+				// AU SERVEUR
 
-         try {
+				writer.flush();
 
+				System.out.println("Commande " + commande + " envoyée au serveur");
 
-            
+				// On attend la réponse
 
-            writer = new PrintWriter(connexion.getOutputStream(), true);
+				String response = read();
 
-            reader = new BufferedInputStream(connexion.getInputStream());
+				System.out.println("\t * " + name + " : Réponse reçue " + response);
 
-            //On envoie la commande au serveur
+			} catch (IOException e1) {
 
-            
+				e1.printStackTrace();
 
-            String commande = getCommand();
+			}
 
-            writer.write(commande);
+			try {
 
-            //TOUJOURS UTILISER flush() POUR ENVOYER RÉELLEMENT DES INFOS AU SERVEUR
+				Thread.currentThread().sleep(1000);
 
-            writer.flush();  
+			} catch (InterruptedException e) {
 
-            
+				e.printStackTrace();
 
-            System.out.println("Commande " + commande + " envoyée au serveur");
+			}
 
-            
+		}
 
-            //On attend la réponse
+		writer.write("CLOSE");
 
-            String response = read();
+		writer.flush();
 
-            System.out.println("\t * " + name + " : Réponse reçue " + response);
+		writer.close();
 
-            
+	}
 
-         } catch (IOException e1) {
+	// Méthode qui permet d'envoyer des commandeS de façon aléatoire
 
-            e1.printStackTrace();
+	private String getCommand() {
 
-         }
+		Random rand = new Random();
 
-         
+		return listCommands[rand.nextInt(listCommands.length)];
 
-         try {
+	}
 
-            Thread.currentThread().sleep(1000);
+	// Méthode pour lire les réponses du serveur
 
-         } catch (InterruptedException e) {
+	private String read() throws IOException {
 
-            e.printStackTrace();
+		String response = "";
 
-         }
+		int stream;
 
-      }
+		byte[] b = new byte[4096];
 
-      
+		stream = reader.read(b);
 
-      writer.write("CLOSE");
+		response = new String(b, 0, stream);
 
-      writer.flush();
+		return response;
 
-      writer.close();
+	}
 
-   }
-
-   
-
-   //Méthode qui permet d'envoyer des commandeS de façon aléatoire
-
-   private String getCommand(){
-
-      Random rand = new Random();
-
-      return listCommands[rand.nextInt(listCommands.length)];
-
-   }
-
-   
-
-   //Méthode pour lire les réponses du serveur
-
-   private String read() throws IOException{      
-
-      String response = "";
-
-      int stream;
-
-      byte[] b = new byte[4096];
-
-      stream = reader.read(b);
-
-      response = new String(b, 0, stream);      
-
-      return response;
-
-   }   
+	public static void main(String[] args) {
+		System.out.println("Lancement du client");
+		String host = "127.0.0.1";
+		int port = 2345;
+		Thread t = new Thread(new ClientConnexion(host, port));
+		t.start();
+	}
 
 }
