@@ -1,3 +1,5 @@
+package jja;
+
 
 import java.io.BufferedInputStream;
 
