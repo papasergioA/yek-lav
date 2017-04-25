@@ -12,6 +12,7 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 
 import java.util.Random;
+import java.util.Scanner;
 
 public class ClientConnexion implements Runnable {
 
@@ -55,7 +56,7 @@ public class ClientConnexion implements Runnable {
 		// nous n'allons faire que 10 demandes par thread...
 
 		for (int i = 0; i < 3; i++) {
-
+/*
 			try {
 
 				Thread.currentThread().sleep(1000);
@@ -65,7 +66,7 @@ public class ClientConnexion implements Runnable {
 				e.printStackTrace();
 
 			}
-
+*/
 			try {
 
 				writer = new PrintWriter(connexion.getOutputStream(), true);
@@ -74,7 +75,7 @@ public class ClientConnexion implements Runnable {
 
 				// On envoie la commande au serveur
 
-				String commande = getCommand();
+				String commande = prompt();
 
 				writer.write(commande);
 
@@ -115,6 +116,13 @@ public class ClientConnexion implements Runnable {
 
 		writer.close();
 
+	}
+
+	private String prompt() {
+		Scanner sc = new Scanner(System.in);
+		System.out.print("Commande : ");
+		String str = sc.nextLine();
+		return str;
 	}
 
 	// Méthode qui permet d'envoyer des commandeS de façon aléatoire

@@ -71,7 +71,12 @@ public class TimeServer {
 		Thread t = new Thread(new Runnable() {
 
 			public void run() {
-
+				int nbDatacenter = 10;
+				App[] test = new App[nbDatacenter];
+				for(int i=0;i< test.length;i++){
+					test[i] = new App();
+				}
+				
 				while (isRunning == true) {
 
 					try {
@@ -84,7 +89,7 @@ public class TimeServer {
 
 						System.out.println("Connexion cliente reçue.");
 
-						Thread t = new Thread(new ClientProcessor(client));
+						Thread t = new Thread(new ClientProcessor(client, test));
 
 						t.start();
 
@@ -121,7 +126,7 @@ public class TimeServer {
 		isRunning = false;
 
 	}
-	
+
 	public static void main(String[] args) {
 		System.out.println("lancement du serveur");
 		String host = "127.0.0.1";

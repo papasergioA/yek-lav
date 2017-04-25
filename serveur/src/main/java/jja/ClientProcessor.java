@@ -22,17 +22,17 @@ public class ClientProcessor implements Runnable{
 
 
    private Socket sock;
-
+   private App[] data;
    private PrintWriter writer = null;
 
    private BufferedInputStream reader = null;
 
    
 
-   public ClientProcessor(Socket pSock){
+   public ClientProcessor(Socket pSock, App[] test){
 
       sock = pSock;
-
+      data = test;
    }
 
    
@@ -93,26 +93,23 @@ public class ClientProcessor implements Runnable{
             //On traite la demande du client en fonction de la commande envoyée
 
             String toSend = "";
+            String[] rep = response.split(" ");
 
+            for(int i=0;i<rep.length;i++){
+            	System.out.println(i + " " + rep[i]);
+            }
             
+            switch(rep[0].toUpperCase()){
 
-            switch(response.toUpperCase()){
+               case "SET":
 
-               case "FULL":
-
-                  toSend = DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.MEDIUM).format(new Date());
-
-                  break;
-
-               case "DATE":
-
-                  toSend = DateFormat.getDateInstance(DateFormat.FULL).format(new Date());
+                  toSend = trouverBonDatacenter(rep[1]).ajouter(rep[1], rep[2]);
 
                   break;
 
-               case "HOUR":
+               case "GET":
 
-                  toSend = DateFormat.getTimeInstance(DateFormat.MEDIUM).format(new Date());
+                   toSend = trouverBonDatacenter(rep[1]).recuperer(rep[1]);
 
                   break;
 
@@ -180,7 +177,14 @@ public class ClientProcessor implements Runnable{
 
    
 
-   //La méthode que nous utilisons pour lire les réponses
+   private App trouverBonDatacenter(String string) {
+	// TODO Auto-generated method stub
+	return data[0];
+}
+
+
+
+//La méthode que nous utilisons pour lire les réponses
 
    private String read() throws IOException{      
 
