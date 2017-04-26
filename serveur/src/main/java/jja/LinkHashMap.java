@@ -11,8 +11,9 @@ public class LinkHashMap {
 	}
 
 
+	@SuppressWarnings("unchecked")
 	public LinkHashMap(){
-		hm = new LinkedHashMap(10){
+		hm = new LinkedHashMap(10,2){
 			private static final int MAX_ENTRIES = 100;
 
 		     protected boolean removeEldestEntry(Map.Entry eldest) {
