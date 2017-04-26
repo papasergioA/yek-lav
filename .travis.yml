@@ -1,3 +1,4 @@
 language: java
-script: mvn test -B
-	mvn clean package
+script:
+  mvn test -B
+  mvn clean package
