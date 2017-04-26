@@ -10,7 +10,6 @@ public class App {
 	}
 
 	public String set(String key, String value) {
-		try {
 			String retour = "ok";
 			if (hmap.get().containsKey(key)) {
 				retour += ": valeur remplacee";
@@ -20,9 +19,6 @@ public class App {
 			hmap.get().put(key, value);
 
 			return retour;
-		} catch (ClassCastException e) {
-			return "erreur: la valeur n'est pas un string";
-		}
 	}
 
 	public String get(Object key) {
