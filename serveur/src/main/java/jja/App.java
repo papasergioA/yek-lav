@@ -22,19 +22,13 @@ public class App {
 	}
 
 	public String get(Object key) {
-		System.out.println("dans get0");
 		String val = (String) hmap.get().get(key);
-		System.out.println("dans get1");
-
+		
 		if (val == null) {
-			System.out.println("dans get2");
-
 			return "erreur: la cle n'existe pas";
 		}
-		System.out.println("dans get3");
 
 		return "\"" + val + "\"";
-
 	}
 
 	public String setHashMap(String keyHmap, String key, String value) {
