@@ -87,7 +87,7 @@ public class ClientConnexion implements Runnable {
 
 				// On attend la réponse
 				String response = read();
-				System.out.println("\t " + response);
+				System.out.println(response);
 
 			} catch (IOException e1) {
 

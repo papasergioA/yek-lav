@@ -3,6 +3,7 @@ package jja;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 /**
  * Hello world!
@@ -25,17 +26,6 @@ public class App
 		return (String)hmap.get().get(key);
 		 
 	}
-	
-	
-	
-    public static void main( String[] args )
-    {
-        App test = new App();
-        System.out.println(test.ajouter("coucou", "azerty"));
-        System.out.println(test.recuperer("coucou"));
-        
-        
-    }
 
 	public String setHashMap(String keyHmap, String key, String value) {
 		LinkHashMap hm = (LinkHashMap)hmap.get().get(keyHmap);
@@ -77,6 +67,48 @@ public class App
 		return retour;
 	}
 	
+	public String getAllHashMap(String keyHmap) {
+		LinkHashMap hm = (LinkHashMap)hmap.get().get(keyHmap);
+
+		if(hm == null){
+			return "erreur: hashMap n'existe pas";
+		}
+		String retour = "";
+		
+		for(Entry<Object, Object> entry : hm.get().entrySet()) {
+		    String cle = (String)entry.getKey();
+		    String valeur = (String)entry.getValue();
+		    retour += cle + " : " + valeur + "\n";
+		}
+		return retour;
+	}
+	
+	
+	public String incremente(String key) {
+		String val = (String)hmap.get().get(key);
+
+		if(val == null){
+			return "erreur: la cle n'existe pas";
+		}
+		
+		String newVal = ""+ (Integer.valueOf(val) + 1);
+		hmap.get().put(key, newVal);
+		
+		return "ok";
+	}	
+	
+	public String decremente(String key) {
+		String val = (String)hmap.get().get(key);
+
+		if(val == null){
+			return "erreur: la cle n'existe pas";
+		}
+		
+		String newVal = ""+ (Integer.valueOf(val) - 1);
+		hmap.get().put(key, newVal);
+		
+		return "ok";
+	}		
 
 
 }
