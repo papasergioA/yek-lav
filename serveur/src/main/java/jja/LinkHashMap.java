@@ -10,9 +10,6 @@ public class LinkHashMap {
 		return hm;
 	}
 
-	public void set(LinkedHashMap<Object, Object> hm) {
-		this.hm = hm;
-	}
 
 	public LinkHashMap(){
 		hm = new LinkedHashMap(10){
