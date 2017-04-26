@@ -26,10 +26,10 @@ public class LinkHashMapTest {
 		assertEquals(hm.get("ttt"),"erreur: la cle n'existe pas");
 		hm.incremente("ter");
 		assertEquals(hm.get("ter"),"\"" + "3" + "\"");
-		assertEquals(hm.incremente("tt"),"erreur: la cle n'existe pas");
+		assertEquals(hm.incremente("tt"),"ok: association cree");
 		hm.decremente("ter");
 		assertEquals(hm.get("ter"),"\"" + "2" + "\"");
-		assertEquals(hm.decremente("tt"),"erreur: la cle n'existe pas");
+		assertEquals(hm.decremente("tt2"),"ok: association cree");
 		assertEquals(hm.set("ter", "f"),"ok: valeur remplacee");
 		assertEquals(hm.decremente("ter"),"erreur: Not a Number");
 		assertEquals(hm.incremente("ter"),"erreur: Not a Number");

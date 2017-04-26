@@ -57,6 +57,24 @@ public class ClientProcessor implements Runnable {
 						toSend = "erreur: nombre d'arguments invalide! (set key value)";
 					}
 					break;
+				case "SETNX":
+					if (rep.length == 2) {
+						toSend = data.set(rep[1], "");
+					} else if (rep.length == 3) {
+						toSend = data.setNX(rep[1], rep[2]);
+					} else {
+						toSend = "erreur: nombre d'arguments invalide! (setNX key value)";
+					}
+					break;
+					
+				case "DEL":
+					if (rep.length == 2) {
+						toSend = data.del(rep[1]);
+					} else {
+						toSend = "erreur: nombre d'arguments invalide! (del key)";
+					}
+					break;
+					
 				case "GET":
 					if (rep.length == 2) {
 						toSend = data.get(rep[1]);
@@ -99,6 +117,49 @@ public class ClientProcessor implements Runnable {
 						toSend = "erreur: nombre d'arguments invalide! (decr key)";
 					}
 					break;
+				case "RPUSH":
+					if (rep.length == 3) {
+						toSend = data.rpush(rep[1], rep[2]);
+					} else {
+						toSend = "erreur: nombre d'arguments invalide! (RPUSH keyList value)";
+					}
+					break;
+				case "LPUSH":
+					if (rep.length == 3) {
+						toSend = data.lpush(rep[1], rep[2]);
+					} else {
+						toSend = "erreur: nombre d'arguments invalide! (LPUSH keyList value)";
+					}
+					break;				
+					case "RPOP":
+						if (rep.length == 2) {
+							toSend = data.rpop(rep[1]);
+						} else {
+							toSend = "erreur: nombre d'arguments invalide! (RPOP keyList)";
+						}
+						break;
+					case "LPOP":
+						if (rep.length == 2) {
+							toSend = data.lpop(rep[1]);
+						} else {
+							toSend = "erreur: nombre d'arguments invalide! (LPOP keyList)";
+						}
+						break;
+					case "LLEN":
+						if (rep.length == 2) {
+							toSend = data.llen(rep[1]);
+						} else {
+							toSend = "erreur: nombre d'arguments invalide! (LLEN keyList)";
+						}
+						break;
+					case "LRANGE":
+						if (rep.length == 4) {
+							toSend = data.lrange(rep[1], rep[2], rep[3]);
+						} else {
+							toSend = "erreur: nombre d'arguments invalide! (LRANGE keyList debut fin)";
+						}
+						break;
+					//  RPUSH, LPUSH, LLEN, LRANGE, LPOP, and RPOP
 				default:
 					toSend = "Commande inconnu !";
 					break;
