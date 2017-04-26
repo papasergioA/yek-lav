@@ -1,6 +1,8 @@
 package jja;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * Hello world!
@@ -8,10 +10,16 @@ import java.util.HashMap;
  */
 public class App 
 {
-	private HashMap<String, String> hmap;
-	
+	private LinkedHashMap<String, String> hmap;
+	//private HashMap<String, String> hmap; 
 	public App() {
-		hmap = new HashMap<>();
+		hmap = new LinkedHashMap(10){
+			private static final int MAX_ENTRIES = 100;
+
+		     protected boolean removeEldestEntry(Map.Entry eldest) {
+		        return size() > MAX_ENTRIES;
+		     }
+		};
 	}
 	
 	public String ajouter(String key, String value){
