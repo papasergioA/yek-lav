@@ -113,6 +113,14 @@ public class ClientProcessor implements Runnable{
 
                   break;
 
+               case "HSET":
+                   toSend = trouverBonDatacenter(rep[1]).setHashMap(rep[1],rep[2],rep[3]);        	   
+            	   break;
+            	   
+               case "HGET":
+                   toSend = trouverBonDatacenter(rep[1]).getHashMap(rep[1],rep[2]);        	   
+            	   break;
+            	   
                case "CLOSE":
 
                   toSend = "Communication terminée"; 

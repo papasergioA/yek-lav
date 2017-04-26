@@ -10,7 +10,7 @@ import java.util.Map;
  */
 public class App 
 {
-	private LinkedHashMap<String, String> hmap;
+	private LinkedHashMap<Object, Object> hmap;
 	//private HashMap<String, String> hmap; 
 	public App() {
 		hmap = new LinkedHashMap(10){
@@ -27,8 +27,9 @@ public class App
 		return "ok";
 	}	
 	
-	public String recuperer(String key){
-		return hmap.get(key);
+	public String recuperer(Object key){
+		return (String)hmap.get(key);
+		 
 	}
 	
 	
@@ -41,4 +42,47 @@ public class App
         
         
     }
+
+	public String setHashMap(String keyHmap, String key, String value) {
+		LinkedHashMap<Object, Object> hm = (LinkedHashMap<Object, Object>)hmap.get(keyHmap);
+;
+		String retour = "";
+
+		if(hm == null){
+			hm =new LinkedHashMap<>();
+			retour += "hmap cree ";
+		}else{
+			retour += "hmap existe ";
+		}
+		
+		if(hm.containsKey(key)){
+			retour += ": valeur remplacee";
+		}else{
+			retour += ": valeur ajoutee";
+		}
+		
+		hm.put(key, value);
+		hmap.put(keyHmap, hm );
+		
+		return retour;
+	}
+	
+	
+	public String getHashMap(String keyHmap, String key) {
+		LinkedHashMap<Object, Object> hm = (LinkedHashMap<Object, Object>)hmap.get(keyHmap);
+
+		if(hm == null){
+			return "erreur: hashMap n'existe pas";
+		}
+		String retour = (String) hm.get(key);
+		
+		if(retour == null){
+			return "erreur: la cle n'existe pas";
+		}
+		
+		return retour;
+	}
+	
+
+
 }

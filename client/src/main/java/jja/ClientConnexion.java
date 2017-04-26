@@ -70,7 +70,6 @@ public class ClientConnexion implements Runnable {
 			try {
 
 				writer = new PrintWriter(connexion.getOutputStream(), true);
-
 				reader = new BufferedInputStream(connexion.getInputStream());
 
 				// On envoie la commande au serveur
@@ -84,13 +83,11 @@ public class ClientConnexion implements Runnable {
 
 				writer.flush();
 
-				System.out.println("Commande " + commande + " envoyée au serveur");
+				//System.out.println("Commande " + commande + " envoyée au serveur");
 
 				// On attend la réponse
-
 				String response = read();
-
-				System.out.println("\t * " + name + " : Réponse reçue " + response);
+				System.out.println("\t " + response);
 
 			} catch (IOException e1) {
 
