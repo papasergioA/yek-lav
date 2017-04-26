@@ -6,28 +6,22 @@ import java.io.IOException;
 
 import java.io.PrintWriter;
 
-import java.net.InetSocketAddress;
-
 import java.net.Socket;
 
 import java.net.SocketException;
 
-import java.text.DateFormat;
-
-import java.util.Date;
-
 public class ClientProcessor implements Runnable {
 
 	private Socket sock;
-	private App[] data;
+	private App data;
 	private PrintWriter writer = null;
 
 	private BufferedInputStream reader = null;
 
-	public ClientProcessor(Socket pSock, App[] test) {
+	public ClientProcessor(Socket pSock, App datacenter) {
 
 		sock = pSock;
-		data = test;
+		data = datacenter;
 	}
 
 	// Le traitement lancé dans un thread séparé
@@ -36,7 +30,6 @@ public class ClientProcessor implements Runnable {
 
 		System.err.println("Lancement du traitement de la connexion cliente");
 
-		boolean closeConnexion = false;
 
 		// tant que la connexion est active, on traite les demandes
 
@@ -44,87 +37,70 @@ public class ClientProcessor implements Runnable {
 
 			try {
 
-				// Ici, nous n'utilisons pas les mêmes objets que précédemment
-
-				// Je vous expliquerai pourquoi ensuite
-
 				writer = new PrintWriter(sock.getOutputStream());
-
 				reader = new BufferedInputStream(sock.getInputStream());
 
 				// On attend la demande du client
-
 				String response = read();
-
-				InetSocketAddress remote = (InetSocketAddress) sock.getRemoteSocketAddress();
-
-				// On affiche quelques infos, pour le débuggage
-
-				String debug = "";
-
-				debug = "Thread : " + Thread.currentThread().getName() + ". ";
-
-				debug += "Demande de l'adresse : " + remote.getAddress().getHostAddress() + ".";
-
-				debug += " Sur le port : " + remote.getPort() + ".\n";
-
-				debug += "\t -> Commande reçue : " + response + "\n";
-
-				System.err.println("\n" + debug);
-
-				// On traite la demande du client en fonction de la commande
-				// envoyée
 
 				String toSend = "";
 				String[] rep = response.split(" ");
 
-				for (int i = 0; i < rep.length; i++) {
-					System.out.println(i + " " + rep[i]);
-				}
-
 				switch (rep[0].toUpperCase()) {
 
 				case "SET":
-
-					toSend = trouverBonDatacenter(rep[1]).ajouter(rep[1], rep[2]);
-
+					if (rep.length == 2) {
+						toSend = data.set(rep[1], "");
+					} else if (rep.length == 3) {
+						toSend = data.set(rep[1], rep[2]);
+					} else {
+						toSend = "erreur: nombre d'arguments invalide! (set key value)";
+					}
 					break;
-
 				case "GET":
-
-					toSend = trouverBonDatacenter(rep[1]).recuperer(rep[1]);
-
+					if (rep.length == 2) {
+						toSend = data.get(rep[1]);
+					} else {
+						toSend = "erreur: nombre d'arguments invalide! (get key)";
+					}
 					break;
-
 				case "HSET":
-					toSend = trouverBonDatacenter(rep[1]).setHashMap(rep[1], rep[2], rep[3]);
+					if (rep.length == 4) {
+						toSend = data.setHashMap(rep[1], rep[2], rep[3]);
+					} else {
+						toSend = "erreur: nombre d'arguments invalide! (hset keyHashMap key value)";
+					}
 					break;
-
 				case "HGET":
-					toSend = trouverBonDatacenter(rep[1]).getHashMap(rep[1], rep[2]);
+					if (rep.length == 3) {
+						toSend = data.getHashMap(rep[1], rep[2]);
+					} else {
+						toSend = "erreur: nombre d'arguments invalide! (hget keyHashMap key)";
+					}
 					break;
 				case "HGETALL":
-					toSend = trouverBonDatacenter(rep[1]).getAllHashMap(rep[1]);
+					if (rep.length == 2) {
+						toSend = data.getAllHashMap(rep[1]);
+					} else {
+						toSend = "erreur: nombre d'arguments invalide! (hgetall keyHashMap)";
+					}
 					break;
 				case "INCR":
-					toSend = trouverBonDatacenter(rep[1]).incremente(rep[1]);
+					if (rep.length == 2) {
+						toSend = data.incremente(rep[1]);
+					} else {
+						toSend = "erreur: nombre d'arguments invalide! (incr key)";
+					}
 					break;
 				case "DECR":
-					toSend = trouverBonDatacenter(rep[1]).decremente(rep[1]);
+					if (rep.length == 2) {
+						toSend = data.decremente(rep[1]);
+					} else {
+						toSend = "erreur: nombre d'arguments invalide! (decr key)";
+					}
 					break;
-
-				case "CLOSE":
-
-					toSend = "Communication terminée";
-
-					closeConnexion = true;
-
-					break;
-
 				default:
-
 					toSend = "Commande inconnu !";
-
 					break;
 
 				}
@@ -132,28 +108,8 @@ public class ClientProcessor implements Runnable {
 				// On envoie la réponse au client
 
 				writer.write(toSend);
-
-				// Il FAUT IMPERATIVEMENT UTILISER flush()
-
-				// Sinon les données ne seront pas transmises au client
-
-				// et il attendra indéfiniment
-
 				writer.flush();
 
-				if (closeConnexion) {
-
-					System.err.println("COMMANDE CLOSE DETECTEE ! ");
-
-					writer = null;
-
-					reader = null;
-
-					sock.close();
-
-					break;
-
-				}
 
 			} catch (SocketException e) {
 
@@ -169,11 +125,6 @@ public class ClientProcessor implements Runnable {
 
 		}
 
-	}
-
-	private App trouverBonDatacenter(String string) {
-		// TODO Auto-generated method stub
-		return data[0];
 	}
 
 	// La méthode que nous utilisons pour lire les réponses
