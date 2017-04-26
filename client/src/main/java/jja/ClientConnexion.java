@@ -2,16 +2,10 @@ package jja;
 
 
 import java.io.BufferedInputStream;
-
 import java.io.IOException;
-
 import java.io.PrintWriter;
-
 import java.net.Socket;
-
 import java.net.UnknownHostException;
-
-import java.util.Random;
 import java.util.Scanner;
 
 public class ClientConnexion implements Runnable {
@@ -22,18 +16,9 @@ public class ClientConnexion implements Runnable {
 
 	private BufferedInputStream reader = null;
 
-	// Notre liste de commandes. Le serveur nous répondra différemment selon la
-	// commande utilisée.
-
-	private String[] listCommands = { "FULL", "DATE", "HOUR", "NONE" };
-
-	private static int count = 0;
-
-	private String name = "Client-";
 
 	public ClientConnexion(String host, int port) {
 
-		name += ++count;
 
 		try {
 
@@ -52,8 +37,6 @@ public class ClientConnexion implements Runnable {
 	}
 
 	public void run() {
-
-		// nous n'allons faire que 10 demandes par thread...
 
 		while (true) {
 
@@ -78,17 +61,6 @@ public class ClientConnexion implements Runnable {
 				e1.printStackTrace();
 
 			}
-
-			try {
-
-				Thread.currentThread().sleep(1000);
-
-			} catch (InterruptedException e) {
-
-				e.printStackTrace();
-
-			}
-
 		}
 	}
 
@@ -99,28 +71,15 @@ public class ClientConnexion implements Runnable {
 		return str;
 	}
 
-	// Méthode qui permet d'envoyer des commandeS de façon aléatoire
-	private String getCommand() {
-
-		Random rand = new Random();
-
-		return listCommands[rand.nextInt(listCommands.length)];
-
-	}
 
 	// Méthode pour lire les réponses du serveur
 	private String read() throws IOException {
 
 		String response = "";
-
 		int stream;
-
 		byte[] b = new byte[4096];
-
 		stream = reader.read(b);
-
 		response = new String(b, 0, stream);
-
 		return response;
 
 	}
