@@ -12,7 +12,7 @@ public class LinkHashMapTest {
 	public void testGet() {
 		LinkHashMap hm = new LinkHashMap();
 		LinkedHashMap h = hm.get();
-		assert(h==hm.get());
+		assertTrue(h==hm.get());
 	}
 	
 
