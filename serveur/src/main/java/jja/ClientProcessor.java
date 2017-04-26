@@ -102,26 +102,21 @@ public class ClientProcessor implements Runnable {
 				default:
 					toSend = "Commande inconnu !";
 					break;
-
 				}
 
 				// On envoie la réponse au client
-
 				writer.write(toSend);
 				writer.flush();
 
 
-			} catch (SocketException e) {
-
+			}
+			catch (SocketException e) {
 				System.err.println("LA CONNEXION A ETE INTERROMPUE ! ");
 				break;
-
 			} 
 			catch (IOException e) {
 				e.printStackTrace();
-
 			} catch (StringIndexOutOfBoundsException e) {
-
 				System.err.println("LA CONNEXION A ETE INTERROMPUE ! ");
 				break;
 			} 

@@ -92,18 +92,6 @@ public class TimeServer {
 
 				}
 
-				try {
-
-					server.close();
-
-				} catch (IOException e) {
-
-					e.printStackTrace();
-
-					server = null;
-
-				}
-
 			}
 
 		});
@@ -112,11 +100,6 @@ public class TimeServer {
 
 	}
 
-	public void close() {
-
-		isRunning = false;
-
-	}
 
 	public static void main(String[] args) {
 		System.out.println("lancement du serveur");
