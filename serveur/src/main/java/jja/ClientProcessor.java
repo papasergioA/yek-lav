@@ -1,6 +1,5 @@
 package jja;
 
-
 import java.io.BufferedInputStream;
 
 import java.io.IOException;
@@ -17,199 +16,182 @@ import java.text.DateFormat;
 
 import java.util.Date;
 
+public class ClientProcessor implements Runnable {
 
-public class ClientProcessor implements Runnable{
+	private Socket sock;
+	private App[] data;
+	private PrintWriter writer = null;
 
+	private BufferedInputStream reader = null;
 
-   private Socket sock;
-   private App[] data;
-   private PrintWriter writer = null;
+	public ClientProcessor(Socket pSock, App[] test) {
 
-   private BufferedInputStream reader = null;
+		sock = pSock;
+		data = test;
+	}
 
-   
+	// Le traitement lancé dans un thread séparé
 
-   public ClientProcessor(Socket pSock, App[] test){
+	public void run() {
 
-      sock = pSock;
-      data = test;
-   }
+		System.err.println("Lancement du traitement de la connexion cliente");
 
-   
+		boolean closeConnexion = false;
 
-   //Le traitement lancé dans un thread séparé
+		// tant que la connexion est active, on traite les demandes
 
-   public void run(){
+		while (!sock.isClosed()) {
 
-      System.err.println("Lancement du traitement de la connexion cliente");
+			try {
 
+				// Ici, nous n'utilisons pas les mêmes objets que précédemment
 
-      boolean closeConnexion = false;
+				// Je vous expliquerai pourquoi ensuite
 
-      //tant que la connexion est active, on traite les demandes
+				writer = new PrintWriter(sock.getOutputStream());
 
-      while(!sock.isClosed()){
+				reader = new BufferedInputStream(sock.getInputStream());
 
-         
+				// On attend la demande du client
 
-         try {
+				String response = read();
 
-            
+				InetSocketAddress remote = (InetSocketAddress) sock.getRemoteSocketAddress();
 
-            //Ici, nous n'utilisons pas les mêmes objets que précédemment
+				// On affiche quelques infos, pour le débuggage
 
-            //Je vous expliquerai pourquoi ensuite
+				String debug = "";
 
-            writer = new PrintWriter(sock.getOutputStream());
+				debug = "Thread : " + Thread.currentThread().getName() + ". ";
 
-            reader = new BufferedInputStream(sock.getInputStream());
+				debug += "Demande de l'adresse : " + remote.getAddress().getHostAddress() + ".";
 
-            
+				debug += " Sur le port : " + remote.getPort() + ".\n";
 
-            //On attend la demande du client            
+				debug += "\t -> Commande reçue : " + response + "\n";
 
-            String response = read();
+				System.err.println("\n" + debug);
 
-            InetSocketAddress remote = (InetSocketAddress)sock.getRemoteSocketAddress();
+				// On traite la demande du client en fonction de la commande
+				// envoyée
 
-            
+				String toSend = "";
+				String[] rep = response.split(" ");
 
-            //On affiche quelques infos, pour le débuggage
+				for (int i = 0; i < rep.length; i++) {
+					System.out.println(i + " " + rep[i]);
+				}
 
-            String debug = "";
+				switch (rep[0].toUpperCase()) {
 
-            debug = "Thread : " + Thread.currentThread().getName() + ". ";
+				case "SET":
 
-            debug += "Demande de l'adresse : " + remote.getAddress().getHostAddress() +".";
+					toSend = trouverBonDatacenter(rep[1]).ajouter(rep[1], rep[2]);
 
-            debug += " Sur le port : " + remote.getPort() + ".\n";
+					break;
 
-            debug += "\t -> Commande reçue : " + response + "\n";
+				case "GET":
 
-            System.err.println("\n" + debug);
+					toSend = trouverBonDatacenter(rep[1]).recuperer(rep[1]);
 
-            
+					break;
 
-            //On traite la demande du client en fonction de la commande envoyée
+				case "HSET":
+					toSend = trouverBonDatacenter(rep[1]).setHashMap(rep[1], rep[2], rep[3]);
+					break;
 
-            String toSend = "";
-            String[] rep = response.split(" ");
+				case "HGET":
+					toSend = trouverBonDatacenter(rep[1]).getHashMap(rep[1], rep[2]);
+					break;
+				case "HGETALL":
+					toSend = trouverBonDatacenter(rep[1]).getAllHashMap(rep[1]);
+					break;
+				case "INCR":
+					toSend = trouverBonDatacenter(rep[1]).incremente(rep[1]);
+					break;
+				case "DECR":
+					toSend = trouverBonDatacenter(rep[1]).decremente(rep[1]);
+					break;
 
-            for(int i=0;i<rep.length;i++){
-            	System.out.println(i + " " + rep[i]);
-            }
-            
-            switch(rep[0].toUpperCase()){
+				case "CLOSE":
 
-               case "SET":
+					toSend = "Communication terminée";
 
-                  toSend = trouverBonDatacenter(rep[1]).ajouter(rep[1], rep[2]);
+					closeConnexion = true;
 
-                  break;
+					break;
 
-               case "GET":
+				default:
 
-                   toSend = trouverBonDatacenter(rep[1]).recuperer(rep[1]);
+					toSend = "Commande inconnu !";
 
-                  break;
+					break;
 
-               case "HSET":
-                   toSend = trouverBonDatacenter(rep[1]).setHashMap(rep[1],rep[2],rep[3]);        	   
-            	   break;
-            	   
-               case "HGET":
-                   toSend = trouverBonDatacenter(rep[1]).getHashMap(rep[1],rep[2]);        	   
-            	   break;
-            	   
-               case "CLOSE":
+				}
 
-                  toSend = "Communication terminée"; 
+				// On envoie la réponse au client
 
-                  closeConnexion = true;
+				writer.write(toSend);
 
-                  break;
+				// Il FAUT IMPERATIVEMENT UTILISER flush()
 
-               default : 
+				// Sinon les données ne seront pas transmises au client
 
-                  toSend = "Commande inconnu !";                     
+				// et il attendra indéfiniment
 
-                  break;
+				writer.flush();
 
-            }
+				if (closeConnexion) {
 
-            
+					System.err.println("COMMANDE CLOSE DETECTEE ! ");
 
-            //On envoie la réponse au client
+					writer = null;
 
-            writer.write(toSend);
+					reader = null;
 
-            //Il FAUT IMPERATIVEMENT UTILISER flush()
+					sock.close();
 
-            //Sinon les données ne seront pas transmises au client
+					break;
 
-            //et il attendra indéfiniment
+				}
 
-            writer.flush();
+			} catch (SocketException e) {
 
-            
+				System.err.println("LA CONNEXION A ETE INTERROMPUE ! ");
 
-            if(closeConnexion){
+				break;
 
-               System.err.println("COMMANDE CLOSE DETECTEE ! ");
+			} catch (IOException e) {
 
-               writer = null;
+				e.printStackTrace();
 
-               reader = null;
+			}
 
-               sock.close();
+		}
 
-               break;
+	}
 
-            }
+	private App trouverBonDatacenter(String string) {
+		// TODO Auto-generated method stub
+		return data[0];
+	}
 
-         }catch(SocketException e){
+	// La méthode que nous utilisons pour lire les réponses
 
-            System.err.println("LA CONNEXION A ETE INTERROMPUE ! ");
+	private String read() throws IOException {
 
-            break;
+		String response = "";
 
-         } catch (IOException e) {
+		int stream;
 
-            e.printStackTrace();
+		byte[] b = new byte[4096];
 
-         }         
+		stream = reader.read(b);
 
-      }
+		response = new String(b, 0, stream);
 
-   }
+		return response;
 
-   
-
-   private App trouverBonDatacenter(String string) {
-	// TODO Auto-generated method stub
-	return data[0];
-}
-
-
-
-//La méthode que nous utilisons pour lire les réponses
-
-   private String read() throws IOException{      
-
-      String response = "";
-
-      int stream;
-
-      byte[] b = new byte[4096];
-
-      stream = reader.read(b);
-
-      response = new String(b, 0, stream);
-
-      return response;
-
-   }
-
-   
+	}
 
 }
