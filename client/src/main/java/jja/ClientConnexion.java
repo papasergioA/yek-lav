@@ -55,18 +55,8 @@ public class ClientConnexion implements Runnable {
 
 		// nous n'allons faire que 10 demandes par thread...
 
-		for (int i = 0; i < 3; i++) {
-/*
-			try {
+		while (true) {
 
-				Thread.currentThread().sleep(1000);
-
-			} catch (InterruptedException e) {
-
-				e.printStackTrace();
-
-			}
-*/
 			try {
 
 				writer = new PrintWriter(connexion.getOutputStream(), true);
@@ -77,13 +67,7 @@ public class ClientConnexion implements Runnable {
 				String commande = prompt();
 
 				writer.write(commande);
-
-				// TOUJOURS UTILISER flush() POUR ENVOYER RÉELLEMENT DES INFOS
-				// AU SERVEUR
-
 				writer.flush();
-
-				//System.out.println("Commande " + commande + " envoyée au serveur");
 
 				// On attend la réponse
 				String response = read();
@@ -106,13 +90,6 @@ public class ClientConnexion implements Runnable {
 			}
 
 		}
-
-		writer.write("CLOSE");
-
-		writer.flush();
-
-		writer.close();
-
 	}
 
 	private String prompt() {
@@ -123,7 +100,6 @@ public class ClientConnexion implements Runnable {
 	}
 
 	// Méthode qui permet d'envoyer des commandeS de façon aléatoire
-
 	private String getCommand() {
 
 		Random rand = new Random();
@@ -133,7 +109,6 @@ public class ClientConnexion implements Runnable {
 	}
 
 	// Méthode pour lire les réponses du serveur
-
 	private String read() throws IOException {
 
 		String response = "";

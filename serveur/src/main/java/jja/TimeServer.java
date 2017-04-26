@@ -71,11 +71,7 @@ public class TimeServer {
 		Thread t = new Thread(new Runnable() {
 
 			public void run() {
-				int nbDatacenter = 10;
-				App[] test = new App[nbDatacenter];
-				for(int i=0;i< test.length;i++){
-					test[i] = new App();
-				}
+				App datacenter = new App();
 				
 				while (isRunning == true) {
 
@@ -89,7 +85,7 @@ public class TimeServer {
 
 						System.out.println("Connexion cliente reçue.");
 
-						Thread t = new Thread(new ClientProcessor(client, test));
+						Thread t = new Thread(new ClientProcessor(client, datacenter));
 
 						t.start();
 

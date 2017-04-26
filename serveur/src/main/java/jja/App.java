@@ -1,114 +1,126 @@
 package jja;
 
-import java.util.HashMap; 
-import java.util.LinkedHashMap;
-import java.util.Map;
 import java.util.Map.Entry;
 
-/**
- * Hello world!
- *
- */
-public class App 
-{
+public class App {
 	private LinkHashMap hmap;
-	//private HashMap<String, String> hmap; 
+
 	public App() {
 		hmap = new LinkHashMap();
 	}
-	
-	public String ajouter(String key, String value){
+
+	public String set(String key, String value) {
+		String retour = "ok";
+		if (hmap.get().containsKey(key)) {
+			retour += ": valeur remplacee";
+		} else {
+			retour += ": valeur ajoutee";
+		}
 		hmap.get().put(key, value);
-		return "ok";
-	}	
-	
-	public String recuperer(Object key){
-		return (String)hmap.get().get(key);
-		 
+
+		return retour;
+	}
+
+	public String get(Object key) {
+		System.out.println("dans get0");
+		String val = (String) hmap.get().get(key);
+		System.out.println("dans get1");
+
+		if (val == null) {
+			System.out.println("dans get2");
+
+			return "erreur: la cle n'existe pas";
+		}
+		System.out.println("dans get3");
+
+		return "\"" + val + "\"";
+
 	}
 
 	public String setHashMap(String keyHmap, String key, String value) {
-		LinkHashMap hm = (LinkHashMap)hmap.get().get(keyHmap);
-;
+		LinkHashMap hm = (LinkHashMap) hmap.get().get(keyHmap);
+		;
 		String retour = "";
 
-		if(hm == null){
-			hm =new LinkHashMap();
+		if (hm == null) {
+			hm = new LinkHashMap();
 			retour += "hmap cree ";
-		}else{
+		} else {
 			retour += "hmap existe ";
 		}
-		
-		if(hm.get().containsKey(key)){
+
+		if (hm.get().containsKey(key)) {
 			retour += ": valeur remplacee";
-		}else{
+		} else {
 			retour += ": valeur ajoutee";
 		}
-		
+
 		hm.get().put(key, value);
-		hmap.get().put(keyHmap, hm );
-		
+		hmap.get().put(keyHmap, hm);
+
 		return retour;
 	}
-	
-	
-	public String getHashMap(String keyHmap, String key) {
-		LinkHashMap hm = (LinkHashMap)hmap.get().get(keyHmap);
 
-		if(hm == null){
+	public String getHashMap(String keyHmap, String key) {
+		LinkHashMap hm = (LinkHashMap) hmap.get().get(keyHmap);
+
+		if (hm == null) {
 			return "erreur: hashMap n'existe pas";
 		}
 		String retour = (String) hm.get().get(key);
-		
-		if(retour == null){
+
+		if (retour == null) {
 			return "erreur: la cle n'existe pas";
 		}
-		
-		return retour;
-	}
-	
-	public String getAllHashMap(String keyHmap) {
-		LinkHashMap hm = (LinkHashMap)hmap.get().get(keyHmap);
 
-		if(hm == null){
+		return "\"" + retour + "\"";
+	}
+
+	public String getAllHashMap(String keyHmap) {
+		LinkHashMap hm = (LinkHashMap) hmap.get().get(keyHmap);
+
+		if (hm == null) {
 			return "erreur: hashMap n'existe pas";
 		}
 		String retour = "";
-		
-		for(Entry<Object, Object> entry : hm.get().entrySet()) {
-		    String cle = (String)entry.getKey();
-		    String valeur = (String)entry.getValue();
-		    retour += cle + " : " + valeur + "\n";
+
+		for (Entry<Object, Object> entry : hm.get().entrySet()) {
+			String cle = (String) entry.getKey();
+			String valeur = (String) entry.getValue();
+			retour += "\"" + cle + "\" : \"" + valeur + "\"\n";
 		}
 		return retour;
 	}
-	
-	
+
 	public String incremente(String key) {
-		String val = (String)hmap.get().get(key);
+		String val = (String) hmap.get().get(key);
 
-		if(val == null){
+		if (val == null) {
 			return "erreur: la cle n'existe pas";
 		}
-		
-		String newVal = ""+ (Integer.valueOf(val) + 1);
-		hmap.get().put(key, newVal);
-		
+		try {
+			String newVal = "" + (Integer.valueOf(val) + 1);
+			hmap.get().put(key, newVal);
+		} catch (Exception e) {
+			return "erreur: Not a Number";
+		}
+
 		return "ok";
-	}	
-	
+	}
+
 	public String decremente(String key) {
-		String val = (String)hmap.get().get(key);
+		String val = (String) hmap.get().get(key);
 
-		if(val == null){
+		if (val == null) {
 			return "erreur: la cle n'existe pas";
 		}
-		
-		String newVal = ""+ (Integer.valueOf(val) - 1);
-		hmap.get().put(key, newVal);
-		
+		try {
+			String newVal = "" + (Integer.valueOf(val) - 1);
+			hmap.get().put(key, newVal);
+		} catch (Exception e) {
+			return "erreur: Not a Number";
+		}
 		return "ok";
-	}		
-
+	}
 
 }
