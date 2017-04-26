@@ -15,11 +15,8 @@ public class TimeServer {
 	// On initialise des valeurs par défaut
 
 	private int port = 2345;
-
 	private String host = "127.0.0.1";
-
 	private ServerSocket server = null;
-
 	private boolean isRunning = true;
 
 	public TimeServer() {
@@ -78,13 +75,11 @@ public class TimeServer {
 					try {
 
 						// On attend une connexion d'un client
-
 						Socket client = server.accept();
 
 						// Une fois reçue, on la traite dans un thread séparé
-
 						System.out.println("Connexion cliente reçue.");
-
+						
 						Thread t = new Thread(new ClientProcessor(client, datacenter));
 
 						t.start();

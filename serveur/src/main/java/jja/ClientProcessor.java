@@ -114,33 +114,27 @@ public class ClientProcessor implements Runnable {
 			} catch (SocketException e) {
 
 				System.err.println("LA CONNEXION A ETE INTERROMPUE ! ");
-
 				break;
 
-			} catch (IOException e) {
-
+			} 
+			catch (IOException e) {
 				e.printStackTrace();
 
-			}
+			} catch (StringIndexOutOfBoundsException e) {
 
+				System.err.println("LA CONNEXION A ETE INTERROMPUE ! ");
+				break;
+			} 
 		}
-
 	}
 
 	// La méthode que nous utilisons pour lire les réponses
-
 	private String read() throws IOException {
-
 		String response = "";
-
 		int stream;
-
 		byte[] b = new byte[4096];
-
 		stream = reader.read(b);
-
 		response = new String(b, 0, stream);
-
 		return response;
 
 	}
