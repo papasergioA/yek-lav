@@ -6,11 +6,11 @@ import java.util.Map;
 public class LinkHashMap {
 	private LinkedHashMap<Object,Object> hm;
 	
-	public LinkedHashMap<Object, Object> getHm() {
+	public LinkedHashMap<Object, Object> get() {
 		return hm;
 	}
 
-	public void setHashmap(LinkedHashMap<Object, Object> hm) {
+	public void set(LinkedHashMap<Object, Object> hm) {
 		this.hm = hm;
 	}
 

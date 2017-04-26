@@ -10,25 +10,19 @@ import java.util.Map;
  */
 public class App 
 {
-	private LinkedHashMap<Object, Object> hmap;
+	private LinkHashMap hmap;
 	//private HashMap<String, String> hmap; 
 	public App() {
-		hmap = new LinkedHashMap(10){
-			private static final int MAX_ENTRIES = 100;
-
-		     protected boolean removeEldestEntry(Map.Entry eldest) {
-		        return size() > MAX_ENTRIES;
-		     }
-		};
+		hmap = new LinkHashMap();
 	}
 	
 	public String ajouter(String key, String value){
-		hmap.put(key, value);
+		hmap.get().put(key, value);
 		return "ok";
 	}	
 	
 	public String recuperer(Object key){
-		return (String)hmap.get(key);
+		return (String)hmap.get().get(key);
 		 
 	}
 	
@@ -44,37 +38,37 @@ public class App
     }
 
 	public String setHashMap(String keyHmap, String key, String value) {
-		LinkedHashMap<Object, Object> hm = (LinkedHashMap<Object, Object>)hmap.get(keyHmap);
+		LinkHashMap hm = (LinkHashMap)hmap.get().get(keyHmap);
 ;
 		String retour = "";
 
 		if(hm == null){
-			hm =new LinkedHashMap<>();
+			hm =new LinkHashMap();
 			retour += "hmap cree ";
 		}else{
 			retour += "hmap existe ";
 		}
 		
-		if(hm.containsKey(key)){
+		if(hm.get().containsKey(key)){
 			retour += ": valeur remplacee";
 		}else{
 			retour += ": valeur ajoutee";
 		}
 		
-		hm.put(key, value);
-		hmap.put(keyHmap, hm );
+		hm.get().put(key, value);
+		hmap.get().put(keyHmap, hm );
 		
 		return retour;
 	}
 	
 	
 	public String getHashMap(String keyHmap, String key) {
-		LinkedHashMap<Object, Object> hm = (LinkedHashMap<Object, Object>)hmap.get(keyHmap);
+		LinkHashMap hm = (LinkHashMap)hmap.get().get(keyHmap);
 
 		if(hm == null){
 			return "erreur: hashMap n'existe pas";
 		}
-		String retour = (String) hm.get(key);
+		String retour = (String) hm.get().get(key);
 		
 		if(retour == null){
 			return "erreur: la cle n'existe pas";
