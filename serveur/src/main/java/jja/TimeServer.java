@@ -22,6 +22,8 @@ public class TimeServer {
 
 	private boolean isRunning = true;
 
+	private int startDataCenter = 2;
+	private int startPortDataCenter = port+1;
 	public TimeServer() {
 
 		try {
@@ -71,11 +73,7 @@ public class TimeServer {
 		Thread t = new Thread(new Runnable() {
 
 			public void run() {
-				int nbDatacenter = 10;
-				App[] test = new App[nbDatacenter];
-				for(int i=0;i< test.length;i++){
-					test[i] = new App();
-				}
+
 				
 				while (isRunning == true) {
 
@@ -89,7 +87,7 @@ public class TimeServer {
 
 						System.out.println("Connexion cliente reçue.");
 
-						Thread t = new Thread(new ClientProcessor(client, test));
+						Thread t = new Thread(new ClientProcessor(client));
 
 						t.start();
 
@@ -131,6 +129,16 @@ public class TimeServer {
 		System.out.println("lancement du serveur");
 		String host = "127.0.0.1";
 		int port = 2345;
+		int startDataCenter = 2;
+		int startPortDataCenter = port+1;
+		int nbDatacenter = 10;
+		Thread[] test = new Thread[nbDatacenter];		
+		for(int i=0;i< test.length;i++){
+			test[i] = new Thread(new App(startDataCenter+i, startPortDataCenter+i));		
+			test[i].start();
+			System.out.println("lancement du datacenter " + (i+1));
+
+		}
 		TimeServer ts = new TimeServer(host, port);
 		ts.open();
 	}

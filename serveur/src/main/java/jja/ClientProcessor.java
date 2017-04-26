@@ -1,6 +1,5 @@
 package jja;
 
-
 import java.io.BufferedInputStream;
 
 import java.io.IOException;
@@ -12,196 +11,181 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 
 import java.net.SocketException;
-
+import java.net.UnknownHostException;
 import java.text.DateFormat;
 
 import java.util.Date;
 
+public class ClientProcessor implements Runnable {
 
-public class ClientProcessor implements Runnable{
+	private Socket sock;
+	private PrintWriter writer = null;
 
+	private BufferedInputStream reader = null;
 
-   private Socket sock;
-   private App[] data;
-   private PrintWriter writer = null;
+	public ClientProcessor(Socket pSock) {
 
-   private BufferedInputStream reader = null;
+		sock = pSock;
+	}
 
-   
+	// Le traitement lancé dans un thread séparé
 
-   public ClientProcessor(Socket pSock, App[] test){
+	public void run() {
 
-      sock = pSock;
-      data = test;
-   }
+		System.err.println("Lancement du traitement de la connexion cliente");
 
-   
+		boolean closeConnexion = false;
 
-   //Le traitement lancé dans un thread séparé
+		// tant que la connexion est active, on traite les demandes
 
-   public void run(){
+		while (!sock.isClosed()) {
 
-      System.err.println("Lancement du traitement de la connexion cliente");
+			try {
 
+				// Ici, nous n'utilisons pas les mêmes objets que
+				// précédemment
 
-      boolean closeConnexion = false;
+				// Je vous expliquerai pourquoi ensuite
 
-      //tant que la connexion est active, on traite les demandes
+				writer = new PrintWriter(sock.getOutputStream());
 
-      while(!sock.isClosed()){
+				reader = new BufferedInputStream(sock.getInputStream());
 
-         
+				// On attend la demande du client
+				String response = read();
 
-         try {
+				InetSocketAddress remote = (InetSocketAddress) sock.getRemoteSocketAddress();
 
-            
+				// On affiche quelques infos, pour le débuggage
 
-            //Ici, nous n'utilisons pas les mêmes objets que précédemment
+				String debug = "";
 
-            //Je vous expliquerai pourquoi ensuite
+				debug = "Thread : " + Thread.currentThread().getName() + ". ";
 
-            writer = new PrintWriter(sock.getOutputStream());
+				debug += "Demande de l'adresse : " + remote.getAddress().getHostAddress() + ".";
 
-            reader = new BufferedInputStream(sock.getInputStream());
+				debug += " Sur le port : " + remote.getPort() + ".\n";
 
-            
+				debug += "\t -> Commande reçue : " + response + "\n";
 
-            //On attend la demande du client            
+				System.err.println("\n" + debug);
 
-            String response = read();
+				// On traite la demande du client en fonction de la commande
+				// envoyée
 
-            InetSocketAddress remote = (InetSocketAddress)sock.getRemoteSocketAddress();
+				String toSend = "";
+				String[] rep = response.split(" ");
 
-            
+				for (int i = 0; i < rep.length; i++) {
+					System.out.println(i + " " + rep[i]);
+				}
 
-            //On affiche quelques infos, pour le débuggage
+				// se connecter au bon datacenter
+				Socket sockdatacenter = null;
+				if (rep.length > 1) {
+					sockdatacenter = connexionDatacenter(rep[1]);
+				} else {
+					sockdatacenter = connexionDatacenter();
+				}
+				PrintWriter writerdatacenter = new PrintWriter(sockdatacenter.getOutputStream());
+				BufferedInputStream readerdatacenter = new BufferedInputStream(sockdatacenter.getInputStream());
+				// On envoie la question au bon datacenter
 
-            String debug = "";
+				writerdatacenter.write(toSend);
+				// Il FAUT IMPERATIVEMENT UTILISER flush()
 
-            debug = "Thread : " + Thread.currentThread().getName() + ". ";
+				// Sinon les données ne seront pas transmises au client
 
-            debug += "Demande de l'adresse : " + remote.getAddress().getHostAddress() +".";
+				// et il attendra indéfiniment
 
-            debug += " Sur le port : " + remote.getPort() + ".\n";
+				writerdatacenter.flush();
+				String responsedatacenter = read();
 
-            debug += "\t -> Commande reçue : " + response + "\n";
+				// on ferme la connexion
+				writerdatacenter = null;
+				readerdatacenter = null;
+				sockdatacenter.close();
 
-            System.err.println("\n" + debug);
+				// on renvoie la r�ponse au client
+				writer.write(responsedatacenter);
 
-            
+				if (closeConnexion) {
 
-            //On traite la demande du client en fonction de la commande envoyée
+					System.err.println("COMMANDE CLOSE DETECTEE ! ");
 
-            String toSend = "";
-            String[] rep = response.split(" ");
+					writer = null;
 
-            for(int i=0;i<rep.length;i++){
-            	System.out.println(i + " " + rep[i]);
-            }
-            
-            switch(rep[0].toUpperCase()){
+					reader = null;
 
-               case "SET":
+					sock.close();
 
-                  toSend = trouverBonDatacenter(rep[1]).ajouter(rep[1], rep[2]);
+					break;
 
-                  break;
+				}
 
-               case "GET":
+			} catch (SocketException e) {
 
-                   toSend = trouverBonDatacenter(rep[1]).recuperer(rep[1]);
+				System.err.println("LA CONNEXION A ETE INTERROMPUE ! ");
 
-                  break;
+				break;
 
-               case "CLOSE":
+			} catch (IOException e) {
 
-                  toSend = "Communication terminée"; 
+				e.printStackTrace();
 
-                  closeConnexion = true;
+			}
 
-                  break;
+		}
 
-               default : 
+	}
 
-                  toSend = "Commande inconnu !";                     
+	private Socket connexionDatacenter() {
 
-                  break;
+		// renvoyer un serveur par d�faut??
 
-            }
+		try {
+			return new Socket("127.0.0.2", 2346);
+		} catch (UnknownHostException e) {
+			e.printStackTrace();
+			return null;
+		} catch (IOException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
 
-            
+	private Socket connexionDatacenter(String string) {
 
-            //On envoie la réponse au client
+		// trouver le bon serveur en fonction du hash
 
-            writer.write(toSend);
+		try {
+			return new Socket("127.0.0.2", 2346);
+		} catch (UnknownHostException e) {
+			e.printStackTrace();
+			return null;
+		} catch (IOException e) {
+			e.printStackTrace();
+			return null;
+		}
 
-            //Il FAUT IMPERATIVEMENT UTILISER flush()
+	}
 
-            //Sinon les données ne seront pas transmises au client
+	// La méthode que nous utilisons pour lire les réponses
 
-            //et il attendra indéfiniment
+	private String read() throws IOException {
 
-            writer.flush();
+		String response = "";
 
-            
+		int stream;
 
-            if(closeConnexion){
+		byte[] b = new byte[4096];
 
-               System.err.println("COMMANDE CLOSE DETECTEE ! ");
+		stream = reader.read(b);
 
-               writer = null;
+		response = new String(b, 0, stream);
 
-               reader = null;
+		return response;
 
-               sock.close();
-
-               break;
-
-            }
-
-         }catch(SocketException e){
-
-            System.err.println("LA CONNEXION A ETE INTERROMPUE ! ");
-
-            break;
-
-         } catch (IOException e) {
-
-            e.printStackTrace();
-
-         }         
-
-      }
-
-   }
-
-   
-
-   private App trouverBonDatacenter(String string) {
-	// TODO Auto-generated method stub
-	return data[0];
-}
-
-
-
-//La méthode que nous utilisons pour lire les réponses
-
-   private String read() throws IOException{      
-
-      String response = "";
-
-      int stream;
-
-      byte[] b = new byte[4096];
-
-      stream = reader.read(b);
-
-      response = new String(b, 0, stream);
-
-      return response;
-
-   }
-
-   
+	}
 
 }

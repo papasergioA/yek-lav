@@ -36,15 +36,13 @@ public class ClientConnexion implements Runnable {
 		name += ++count;
 
 		try {
-
+			System.out.println("avant" + host + " " + port);
 			connexion = new Socket(host, port);
 
 		} catch (UnknownHostException e) {
-
 			e.printStackTrace();
 
 		} catch (IOException e) {
-
 			e.printStackTrace();
 
 		}
