@@ -48,153 +48,69 @@ public class ClientProcessor implements Runnable {
 				switch (rep[0].toUpperCase()) {
 
 				case "SET":
-					if (rep.length == 2) {
-						toSend = data.set(rep[1], "");
-					} else if (rep.length == 3) {
-						toSend = data.set(rep[1], rep[2]);
-					} else {
-						toSend = "erreur: nombre d'arguments invalide! (set key value)";
-					}
+					toSend = set(rep);
 					break;
 				case "SETNX":
-					if (rep.length == 2) {
-						toSend = data.set(rep[1], "");
-					} else if (rep.length == 3) {
-						toSend = data.setNX(rep[1], rep[2]);
-					} else {
-						toSend = "erreur: nombre d'arguments invalide! (setNX key value)";
-					}
+					toSend = setnx(rep);
 					break;
 
 				case "DEL":
-					if (rep.length == 2) {
-						toSend = data.del(rep[1]);
-					} else {
-						toSend = "erreur: nombre d'arguments invalide! (del key)";
-					}
+					toSend = del(rep);
 					break;
 
 				case "GET":
-					if (rep.length == 2) {
-						toSend = data.get(rep[1]);
-					} else {
-						toSend = "erreur: nombre d'arguments invalide! (get key)";
-					}
+					toSend = get(rep);
 					break;
 				case "HSET":
-					if (rep.length == 4) {
-						toSend = data.setHashMap(rep[1], rep[2], rep[3]);
-					} else {
-						toSend = "erreur: nombre d'arguments invalide! (hset keyHashMap key value)";
-					}
+					toSend = hset(rep);
 					break;
 				case "HGET":
-					if (rep.length == 3) {
-						toSend = data.getHashMap(rep[1], rep[2]);
-					} else {
-						toSend = "erreur: nombre d'arguments invalide! (hget keyHashMap key)";
-					}
+					toSend = hget(rep);
 					break;
 				case "HGETALL":
-					if (rep.length == 2) {
-						toSend = data.getAllHashMap(rep[1]);
-					} else {
-						toSend = "erreur: nombre d'arguments invalide! (hgetall keyHashMap)";
-					}
+					toSend = hgetall(rep);
 					break;
 				case "INCR":
-					if (rep.length == 2) {
-						toSend = data.incremente(rep[1]);
-					} else {
-						toSend = "erreur: nombre d'arguments invalide! (incr key)";
-					}
+					toSend = incr(rep);
 					break;
 				case "DECR":
-					if (rep.length == 2) {
-						toSend = data.decremente(rep[1]);
-					} else {
-						toSend = "erreur: nombre d'arguments invalide! (decr key)";
-					}
+					toSend = decr(rep);
 					break;
 				case "RPUSH":
-					if (rep.length == 3) {
-						toSend = data.rpush(rep[1], rep[2]);
-					} else {
-						toSend = "erreur: nombre d'arguments invalide! (RPUSH keyList value)";
-					}
+					toSend = rpush(rep);
 					break;
 				case "LPUSH":
-					if (rep.length == 3) {
-						toSend = data.lpush(rep[1], rep[2]);
-					} else {
-						toSend = "erreur: nombre d'arguments invalide! (LPUSH keyList value)";
-					}
+					toSend = lpush(rep);
 					break;
 				case "RPOP":
-					if (rep.length == 2) {
-						toSend = data.rpop(rep[1]);
-					} else {
-						toSend = "erreur: nombre d'arguments invalide! (RPOP keyList)";
-					}
+					toSend = rpop(rep);
 					break;
 				case "LPOP":
-					if (rep.length == 2) {
-						toSend = data.lpop(rep[1]);
-					} else {
-						toSend = "erreur: nombre d'arguments invalide! (LPOP keyList)";
-					}
+					toSend = lpop(rep);
 					break;
 				case "LLEN":
-					if (rep.length == 2) {
-						toSend = data.llen(rep[1]);
-					} else {
-						toSend = "erreur: nombre d'arguments invalide! (LLEN keyList)";
-					}
+					toSend = llen(rep);
 					break;
 				case "LRANGE":
-					if (rep.length == 4) {
-						toSend = data.lrange(rep[1], rep[2], rep[3]);
-					} else {
-						toSend = "erreur: nombre d'arguments invalide! (LRANGE keyList debut fin)";
-					}
+					toSend = lrange(rep);
 					break;
 				case "SADD":
-					if (rep.length == 3) {
-						toSend = data.setAdd(rep[1], rep[2]);
-					} else {
-						toSend = "erreur: nombre d'arguments invalide! (SADD keySet value)";
-					}
+					toSend = sadd(rep);
 					break;
 				case "SREM":
-					if (rep.length == 3) {
-						toSend = data.setRemove(rep[1], rep[2]);
-					} else {
-						toSend = "erreur: nombre d'arguments invalide! (SREM keyList value)";
-					}
+					toSend = srem(rep);
 					break;
 				case "SMEMBERS":
-					if (rep.length == 2) {
-						toSend = data.setMembers(rep[1]);
-					} else {
-						toSend = "erreur: nombre d'arguments invalide! (SMEMBERS keyList)";
-					}
+					toSend = smembers(rep);
 					break;
 				case "SISMEMBER":
-					if (rep.length == 3) {
-						toSend = data.setIsMembers(rep[1],rep[2]);
-					} else {
-						toSend = "erreur: nombre d'arguments invalide! (SISMEMBERS keyList value)";
-					}
+					toSend = sismember(rep);
 					break;
 				case "SUNION":
-					if (rep.length == 3) {
-						toSend = data.setUnion(rep[1],rep[2]);
-					} else {
-						toSend = "erreur: nombre d'arguments invalide! (SUNION keyList1 keyList2)";
-					}
+					toSend = sunion(rep);
 					break;
 				default:
-					toSend = "Commande inconnu !";
+					toSend = inconnu();
 					break;
 				}
 
@@ -212,6 +128,216 @@ public class ClientProcessor implements Runnable {
 				break;
 			}
 		}
+	}
+
+	public String inconnu() {
+		String toSend;
+		toSend = "Commande inconnu !";
+		return toSend;
+	}
+
+	public String sunion(String[] rep) {
+		String toSend;
+		if (rep.length == 3) {
+			toSend = data.setUnion(rep[1],rep[2]);
+		} else {
+			toSend = "erreur: nombre d'arguments invalide! (SUNION keyList1 keyList2)";
+		}
+		return toSend;
+	}
+
+	public String sismember(String[] rep) {
+		String toSend;
+		if (rep.length == 3) {
+			toSend = data.setIsMembers(rep[1],rep[2]);
+		} else {
+			toSend = "erreur: nombre d'arguments invalide! (SISMEMBERS keyList value)";
+		}
+		return toSend;
+	}
+
+	public String smembers(String[] rep) {
+		String toSend;
+		if (rep.length == 2) {
+			toSend = data.setMembers(rep[1]);
+		} else {
+			toSend = "erreur: nombre d'arguments invalide! (SMEMBERS keyList)";
+		}
+		return toSend;
+	}
+
+	public String srem(String[] rep) {
+		String toSend;
+		if (rep.length == 3) {
+			toSend = data.setRemove(rep[1], rep[2]);
+		} else {
+			toSend = "erreur: nombre d'arguments invalide! (SREM keyList value)";
+		}
+		return toSend;
+	}
+
+	public String sadd(String[] rep) {
+		String toSend;
+		if (rep.length == 3) {
+			toSend = data.setAdd(rep[1], rep[2]);
+		} else {
+			toSend = "erreur: nombre d'arguments invalide! (SADD keySet value)";
+		}
+		return toSend;
+	}
+
+	public String lrange(String[] rep) {
+		String toSend;
+		if (rep.length == 4) {
+			toSend = data.lrange(rep[1], rep[2], rep[3]);
+		} else {
+			toSend = "erreur: nombre d'arguments invalide! (LRANGE keyList debut fin)";
+		}
+		return toSend;
+	}
+
+	public String llen(String[] rep) {
+		String toSend;
+		if (rep.length == 2) {
+			toSend = data.llen(rep[1]);
+		} else {
+			toSend = "erreur: nombre d'arguments invalide! (LLEN keyList)";
+		}
+		return toSend;
+	}
+
+	public String lpop(String[] rep) {
+		String toSend;
+		if (rep.length == 2) {
+			toSend = data.lpop(rep[1]);
+		} else {
+			toSend = "erreur: nombre d'arguments invalide! (LPOP keyList)";
+		}
+		return toSend;
+	}
+
+	public String rpop(String[] rep) {
+		String toSend;
+		if (rep.length == 2) {
+			toSend = data.rpop(rep[1]);
+		} else {
+			toSend = "erreur: nombre d'arguments invalide! (RPOP keyList)";
+		}
+		return toSend;
+	}
+
+	public String lpush(String[] rep) {
+		String toSend;
+		if (rep.length == 3) {
+			toSend = data.lpush(rep[1], rep[2]);
+		} else {
+			toSend = "erreur: nombre d'arguments invalide! (LPUSH keyList value)";
+		}
+		return toSend;
+	}
+
+	public String rpush(String[] rep) {
+		String toSend;
+		if (rep.length == 3) {
+			toSend = data.rpush(rep[1], rep[2]);
+		} else {
+			toSend = "erreur: nombre d'arguments invalide! (RPUSH keyList value)";
+		}
+		return toSend;
+	}
+
+	public String decr(String[] rep) {
+		String toSend;
+		if (rep.length == 2) {
+			toSend = data.decremente(rep[1]);
+		} else {
+			toSend = "erreur: nombre d'arguments invalide! (decr key)";
+		}
+		return toSend;
+	}
+
+	public String incr(String[] rep) {
+		String toSend;
+		if (rep.length == 2) {
+			toSend = data.incremente(rep[1]);
+		} else {
+			toSend = "erreur: nombre d'arguments invalide! (incr key)";
+		}
+		return toSend;
+	}
+
+	public String hgetall(String[] rep) {
+		String toSend;
+		if (rep.length == 2) {
+			toSend = data.getAllHashMap(rep[1]);
+		} else {
+			toSend = "erreur: nombre d'arguments invalide! (hgetall keyHashMap)";
+		}
+		return toSend;
+	}
+
+	public String hget(String[] rep) {
+		String toSend;
+		if (rep.length == 3) {
+			toSend = data.getHashMap(rep[1], rep[2]);
+		} else {
+			toSend = "erreur: nombre d'arguments invalide! (hget keyHashMap key)";
+		}
+		return toSend;
+	}
+
+	public String hset(String[] rep) {
+		String toSend;
+		if (rep.length == 4) {
+			toSend = data.setHashMap(rep[1], rep[2], rep[3]);
+		} else {
+			toSend = "erreur: nombre d'arguments invalide! (hset keyHashMap key value)";
+		}
+		return toSend;
+	}
+
+	public String get(String[] rep) {
+		String toSend;
+		if (rep.length == 2) {
+			toSend = data.get(rep[1]);
+		} else {
+			toSend = "erreur: nombre d'arguments invalide! (get key)";
+		}
+		return toSend;
+	}
+
+	public String del(String[] rep) {
+		String toSend;
+		if (rep.length == 2) {
+			toSend = data.del(rep[1]);
+		} else {
+			toSend = "erreur: nombre d'arguments invalide! (del key)";
+		}
+		return toSend;
+	}
+
+	public String setnx(String[] rep) {
+		String toSend;
+		if (rep.length == 2) {
+			toSend = data.set(rep[1], "");
+		} else if (rep.length == 3) {
+			toSend = data.setNX(rep[1], rep[2]);
+		} else {
+			toSend = "erreur: nombre d'arguments invalide! (setNX key value)";
+		}
+		return toSend;
+	}
+
+	public String set(String[] rep) {
+		String toSend;
+		if (rep.length == 2) {
+			toSend = data.set(rep[1], "");
+		} else if (rep.length == 3) {
+			toSend = data.set(rep[1], rep[2]);
+		} else {
+			toSend = "erreur: nombre d'arguments invalide! (set key value)";
+		}
+		return toSend;
 	}
 
 	// La méthode que nous utilisons pour lire les réponses
