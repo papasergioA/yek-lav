@@ -30,7 +30,6 @@ public class ClientProcessor implements Runnable {
 
 		System.err.println("Lancement du traitement de la connexion cliente");
 
-
 		// tant que la connexion est active, on traite les demandes
 
 		while (!sock.isClosed()) {
@@ -66,7 +65,7 @@ public class ClientProcessor implements Runnable {
 						toSend = "erreur: nombre d'arguments invalide! (setNX key value)";
 					}
 					break;
-					
+
 				case "DEL":
 					if (rep.length == 2) {
 						toSend = data.del(rep[1]);
@@ -74,7 +73,7 @@ public class ClientProcessor implements Runnable {
 						toSend = "erreur: nombre d'arguments invalide! (del key)";
 					}
 					break;
-					
+
 				case "GET":
 					if (rep.length == 2) {
 						toSend = data.get(rep[1]);
@@ -130,36 +129,70 @@ public class ClientProcessor implements Runnable {
 					} else {
 						toSend = "erreur: nombre d'arguments invalide! (LPUSH keyList value)";
 					}
-					break;				
-					case "RPOP":
-						if (rep.length == 2) {
-							toSend = data.rpop(rep[1]);
-						} else {
-							toSend = "erreur: nombre d'arguments invalide! (RPOP keyList)";
-						}
-						break;
-					case "LPOP":
-						if (rep.length == 2) {
-							toSend = data.lpop(rep[1]);
-						} else {
-							toSend = "erreur: nombre d'arguments invalide! (LPOP keyList)";
-						}
-						break;
-					case "LLEN":
-						if (rep.length == 2) {
-							toSend = data.llen(rep[1]);
-						} else {
-							toSend = "erreur: nombre d'arguments invalide! (LLEN keyList)";
-						}
-						break;
-					case "LRANGE":
-						if (rep.length == 4) {
-							toSend = data.lrange(rep[1], rep[2], rep[3]);
-						} else {
-							toSend = "erreur: nombre d'arguments invalide! (LRANGE keyList debut fin)";
-						}
-						break;
-					//  RPUSH, LPUSH, LLEN, LRANGE, LPOP, and RPOP
+					break;
+				case "RPOP":
+					if (rep.length == 2) {
+						toSend = data.rpop(rep[1]);
+					} else {
+						toSend = "erreur: nombre d'arguments invalide! (RPOP keyList)";
+					}
+					break;
+				case "LPOP":
+					if (rep.length == 2) {
+						toSend = data.lpop(rep[1]);
+					} else {
+						toSend = "erreur: nombre d'arguments invalide! (LPOP keyList)";
+					}
+					break;
+				case "LLEN":
+					if (rep.length == 2) {
+						toSend = data.llen(rep[1]);
+					} else {
+						toSend = "erreur: nombre d'arguments invalide! (LLEN keyList)";
+					}
+					break;
+				case "LRANGE":
+					if (rep.length == 4) {
+						toSend = data.lrange(rep[1], rep[2], rep[3]);
+					} else {
+						toSend = "erreur: nombre d'arguments invalide! (LRANGE keyList debut fin)";
+					}
+					break;
+				case "SADD":
+					if (rep.length == 3) {
+						toSend = data.setAdd(rep[1], rep[2]);
+					} else {
+						toSend = "erreur: nombre d'arguments invalide! (SADD keySet value)";
+					}
+					break;
+				case "SREM":
+					if (rep.length == 3) {
+						toSend = data.setRemove(rep[1], rep[2]);
+					} else {
+						toSend = "erreur: nombre d'arguments invalide! (SREM keyList value)";
+					}
+					break;
+				case "SMEMBERS":
+					if (rep.length == 2) {
+						toSend = data.setMembers(rep[1]);
+					} else {
+						toSend = "erreur: nombre d'arguments invalide! (SMEMBERS keyList)";
+					}
+					break;
+				case "SISMEMBER":
+					if (rep.length == 3) {
+						toSend = data.setIsMembers(rep[1],rep[2]);
+					} else {
+						toSend = "erreur: nombre d'arguments invalide! (SISMEMBERS keyList value)";
+					}
+					break;
+				case "SUNION":
+					if (rep.length == 3) {
+						toSend = data.setUnion(rep[1],rep[2]);
+					} else {
+						toSend = "erreur: nombre d'arguments invalide! (SUNION keyList1 keyList2)";
+					}
+					break;
 				default:
 					toSend = "Commande inconnu !";
 					break;
@@ -169,18 +202,15 @@ public class ClientProcessor implements Runnable {
 				writer.write(toSend);
 				writer.flush();
 
-
-			}
-			catch (SocketException e) {
+			} catch (SocketException e) {
 				System.err.println("LA CONNEXION A ETE INTERROMPUE ! ");
 				break;
-			} 
-			catch (IOException e) {
+			} catch (IOException e) {
 				e.printStackTrace();
 			} catch (StringIndexOutOfBoundsException e) {
 				System.err.println("LA CONNEXION A ETE INTERROMPUE ! ");
 				break;
-			} 
+			}
 		}
 	}
 

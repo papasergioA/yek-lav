@@ -1,8 +1,10 @@
 package jja;
 
 import java.util.ArrayDeque;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map.Entry;
+import java.util.Set;
 
 public class App {
 	private LinkHashMap hmap;
@@ -265,7 +267,7 @@ public class App {
 			return "erreur: ce n'est pas une list";
 		}
 	}
-	
+
 	public String lrange(String keyList, String debut, String fin) {
 		try {
 			ArrayDeque<Object> list = (ArrayDeque<Object>) hmap.get().get(keyList);
@@ -276,34 +278,150 @@ public class App {
 			String retour = "";
 			Iterator it = list.iterator();
 			int deb = Integer.valueOf(debut);
-			
+
 			int fi = Integer.valueOf(fin);
-			if(fi == -1){
+			if (fi == -1) {
 				fi = list.size();
-			}else{
+			} else {
 				fi = fi % list.size();
 			}
-			
-			int i=1;
+
+			int i = 1;
 			int num = 1;
 			String buff = "";
-			while(it.hasNext()){
-				buff = (String)it.next();
+			while (it.hasNext()) {
+				buff = (String) it.next();
 
-				if(i>=deb && i <= fi){
+				if (i >= deb && i <= fi) {
 					retour += num + ") " + buff + "\n";
 					num++;
 				}
 				i++;
 			}
-			
+
 			return retour;
 
 		} catch (ClassCastException e) {
 			return "erreur: ce n'est pas une list";
-		}catch (NumberFormatException e) {
+		} catch (NumberFormatException e) {
 			return "erreur: Not a Number";
 		}
 	}
-	
+
+	public String setAdd(String keySet, String value) {
+		try {
+			Set<Object> set = (Set<Object>) hmap.get().get(keySet);
+
+			String retour = "";
+
+			if (set == null) {
+				set = new HashSet<>();
+				retour += "set cree ";
+			} else {
+				retour += "set existe ";
+			}
+
+			set.add(value);
+			retour += ": valeur ajoutee";
+
+			hmap.get().put(keySet, set);
+
+			return retour;
+		} catch (ClassCastException e) {
+			return "erreur: ce n'est pas un set";
+		}
+	}
+
+	public String setRemove(String keySet, String value) {
+		try {
+			Set<Object> set = (Set<Object>) hmap.get().get(keySet);
+
+			if (set == null) {
+				return "erreur: set n'existe pas";
+			}
+
+			if (set.remove(value)) {
+				return "ok";
+			} else {
+				return "erreur: valeur non présente dans le set";
+			}
+
+		} catch (ClassCastException e) {
+			return "erreur: ce n'est pas un set";
+		}
+	}
+
+	public String setMembers(String keySet) {
+		try {
+			Set<Object> set = (Set<Object>) hmap.get().get(keySet);
+
+			if (set == null) {
+				return "\"\"";
+			}
+			String retour = "";
+
+			Iterator it = set.iterator();
+			String buff = "";
+			int num = 1;
+			while (it.hasNext()) {
+				retour += num + ") " + (String) it.next() + "\n";
+				num++;
+			}
+			return retour;
+		} catch (ClassCastException e) {
+			return "erreur: ce n'est pas un set";
+		}
+	}
+
+	public String setIsMembers(String keySet, String value) {
+		try {
+			Set<Object> set = (Set<Object>) hmap.get().get(keySet);
+
+			if (set == null) {
+				return "0";
+			}
+
+			if (set.contains(value)) {
+				return "1";
+			} else {
+				return "0";
+			}
+
+		} catch (ClassCastException e) {
+			return "erreur: ce n'est pas un set";
+		}
+	}
+
+	public String setUnion(String keySet1, String keySet2) {
+		try {
+			Set<Object> set1 = (Set<Object>) hmap.get().get(keySet1);
+			Set<Object> set2 = (Set<Object>) hmap.get().get(keySet2);
+			Set<Object> set = new HashSet<>();
+
+			if (set1 != null) {
+				set.addAll(set1);
+			}
+
+			if (set2 != null) {
+				set.addAll(set2);
+			}
+
+			if (set.isEmpty()) {
+				return "\"\"";
+			} else {
+				String retour = "";
+				Iterator it = set.iterator();
+				String buff = "";
+				int num = 1;
+				while (it.hasNext()) {
+					retour += num + ") " + (String) it.next() + "\n";
+					num++;
+				}
+				return retour;
+			}
+		} catch (ClassCastException e) {
+			return "erreur: ce n'est pas un set";
+		}
+	}
+
 }
