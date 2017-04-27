@@ -343,7 +343,7 @@ public class App {
 			if (set.remove(value)) {
 				return "ok";
 			} else {
-				return "erreur: valeur non présente dans le set";
+				return "erreur: valeur non presente dans le set";
 			}
 
 		} catch (ClassCastException e) {
