@@ -104,7 +104,7 @@ public class LinkHashMapTest {
 		assertEquals(hm.setIsMembers("op",""),"erreur: ce n'est pas un set");
 		
 		assertEquals(hm.setUnion("aze","adsq"),"\"\"");
-		assertEquals(hm.setUnion("nk","n"),1 + ") " + "t" + "\n" + 2 + ") " + "e" + "\n");
+		assertEquals(hm.setUnion("nk","n"),1 + ") " + "e" + "\n" + 2 + ") " + "t" + "\n");
 		assertEquals(hm.setUnion("op",""),"erreur: ce n'est pas un set");
 		
 		assertEquals(hm.setNX("ter", "2"),"erreur: clef deja existante");
